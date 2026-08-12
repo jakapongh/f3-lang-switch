@@ -6,12 +6,12 @@ APP_NAME="F3 Lang Switch"
 BUNDLE_ID="com.user.f3-lang-switch"
 BUILD_DIR="$ROOT/.build"
 APP_DIR="$BUILD_DIR/$APP_NAME.app"
-INSTALL_DIR="$HOME/Applications"
 SOURCES=(
   "$ROOT/Sources/F3LangSwitchApp.swift"
   "$ROOT/Sources/AppSettings.swift"
   "$ROOT/Sources/MissionControlRemapper.swift"
   "$ROOT/Sources/LaunchAgentHelper.swift"
+  "$ROOT/Sources/SettingsWindow.swift"
 )
 
 echo "→ Compiling…"
@@ -51,9 +51,9 @@ cat > "$APP_DIR/Contents/Info.plist" << EOF
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
-  <string>1.1.0</string>
+  <string>1.2.0</string>
   <key>CFBundleVersion</key>
-  <string>2</string>
+  <string>3</string>
   <key>LSMinimumSystemVersion</key>
   <string>13.0</string>
   <key>LSUIElement</key>
@@ -68,17 +68,13 @@ EOF
 
 codesign --force --deep --sign - "$APP_DIR" >/dev/null
 
-echo "→ Installing to $INSTALL_DIR…"
-mkdir -p "$INSTALL_DIR"
-rm -rf "$INSTALL_DIR/$APP_NAME.app"
-cp -R "$APP_DIR" "$INSTALL_DIR/$APP_NAME.app"
-codesign --force --deep --sign - "$INSTALL_DIR/$APP_NAME.app" >/dev/null
-
 if [[ -w /Applications ]]; then
   rm -rf "/Applications/$APP_NAME.app"
   cp -R "$APP_DIR" "/Applications/$APP_NAME.app"
   codesign --force --deep --sign - "/Applications/$APP_NAME.app" >/dev/null
-  echo "→ Also installed to /Applications"
+  echo "→ Installed to /Applications"
+else
+  echo "→ Skipped: /Applications is not writable; app remains in $BUILD_DIR"
 fi
 
-echo "✓ Built: $INSTALL_DIR/$APP_NAME.app"
+echo "✓ Built: $APP_DIR"
